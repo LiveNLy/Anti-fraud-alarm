@@ -7,7 +7,7 @@ public class Alarm : MonoBehaviour
     private AudioSource _audioSource;
     private Coroutine _checkAudioSourse;
     private float _numberOfVoiceChange = 0.1f;
-    private float _targetVolume;
+    private float _waitingTimeOfCoroutine = 0.5f;
 
     private void Start()
     {
@@ -24,26 +24,26 @@ public class Alarm : MonoBehaviour
         _checkAudioSourse = StartCoroutine(StartAudioSourse(number));
     }
 
-    public void MakeSoundQuiter(float number)
+    public void MakeSoundQuiter(float targetVolume)
     {
         StopCoroutine(_checkAudioSourse);
-        _checkAudioSourse = StartCoroutine(StartAudioSourse(number));
+        _checkAudioSourse = StartCoroutine(StartAudioSourse(targetVolume));
     }
 
-    private IEnumerator StartAudioSourse(float number)
+    private IEnumerator StartAudioSourse(float targetVolume)
     {
-        _targetVolume = number;
+        var waitingTime = new WaitForSeconds(_waitingTimeOfCoroutine);
 
         if (_audioSource.volume == 0)
         {
             _audioSource.Play();
         }
 
-        while (_audioSource.volume != _targetVolume)
+        while (_audioSource.volume != targetVolume)
         {
-            _audioSource.volume = Mathf.MoveTowards(_audioSource.volume, _targetVolume, _numberOfVoiceChange);
+            _audioSource.volume = Mathf.MoveTowards(_audioSource.volume, targetVolume, _numberOfVoiceChange);
 
-            yield return new WaitForSeconds(0.5f);
+            yield return waitingTime;
         }
 
         if (_audioSource.volume == 0)
