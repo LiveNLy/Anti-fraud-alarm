@@ -7,6 +7,11 @@ public class House : MonoBehaviour
 
     private void OnEnable()
     {
-        _alarmTrigger.thiefDiscovered += _alarm.ChangeSound;
+        _alarmTrigger.ThiefDetected += _alarm.MakeSoundLouder;
+    }
+
+    private void OnDisable()
+    {
+        _alarmTrigger.ThiefDetected += _alarm.MakeSoundQuiter;
     }
 }

@@ -6,39 +6,49 @@ public class Alarm : MonoBehaviour
 {
     private AudioSource _audioSource;
     private Coroutine _checkAudioSourse;
-    private float _soundChanger;
-    private float numberOfVoiceChange = 0.5f;
-    private float targetVolume = 1;
+    private float _numberOfVoiceChange = 0.1f;
+    private float _targetVolume;
 
     private void Start()
     {
         _audioSource = GetComponent<AudioSource>();
-        _checkAudioSourse = StartCoroutine(CheckAudioSourse());
     }
 
-    private void Update()
+    public void MakeSoundLouder(float number)
     {
-        _audioSource.volume = Mathf.MoveTowards(_audioSource.volume, targetVolume, (numberOfVoiceChange * _soundChanger) * Time.deltaTime);
-    }
-
-    public void ChangeSound(float changer)
-    {
-        if (_audioSource.volume == 0)
-            _audioSource.Play();
-
-        _soundChanger = changer;
-    }
-
-    private IEnumerator CheckAudioSourse()
-    {
-        int secondsToCheck = 3;
-
-        while (true)
+        if (_checkAudioSourse != null)
         {
-            if (_audioSource.volume == 0)
-                _audioSource.Stop();
+            StopCoroutine(_checkAudioSourse);
+        }
 
-            yield return new WaitForSeconds(secondsToCheck);
+        _checkAudioSourse = StartCoroutine(StartAudioSourse(number));
+    }
+
+    public void MakeSoundQuiter(float number)
+    {
+        StopCoroutine(_checkAudioSourse);
+        _checkAudioSourse = StartCoroutine(StartAudioSourse(number));
+    }
+
+    private IEnumerator StartAudioSourse(float number)
+    {
+        _targetVolume = number;
+
+        if (_audioSource.volume == 0)
+        {
+            _audioSource.Play();
+        }
+
+        while (_audioSource.volume != _targetVolume)
+        {
+            _audioSource.volume = Mathf.MoveTowards(_audioSource.volume, _targetVolume, _numberOfVoiceChange);
+
+            yield return new WaitForSeconds(0.5f);
+        }
+
+        if (_audioSource.volume == 0)
+        {
+            _audioSource.Stop();
         }
     }
 }
